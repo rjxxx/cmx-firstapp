@@ -4,10 +4,18 @@
     * [Основные понятия и команды](#основные-понятия-и-команды)
     * [Git Flow](#git-flow)
     * [Графическая оболочка для работы с git](#графическая-оболочка-для-работы-с-git)
+    * [Тест для самопроверки по VCS](#тест-для-самопроверки-по-vcs)
+  * [Системы сборки](#системы-сборки)
+    * [Maven](#maven)
+    * [Тест для самопроверки по Maven](#тест-для-самопроверки-по-maven)
+  * [Best practices in code and app architecture (pt. 1)](#best-practices-in-code-and-app-architecture-pt-1)
+  * [IoC, DI, Spring](#ioc-di-spring)
+    * [Теоретическая информация](#теоретическая-информация)
+    * [Тест для самопроверки по IoC](#тест-для-самопроверки-по-ioc)
+  * [Spring Boot](#spring-boot)
   * [Создание проекта, структура](#создание-проекта-структура)
     * [Создание основного проекта](#создание-основного-проекта)
     * [Многомодульная структура](#многомодульная-структура)
-  * [Maven](#maven)
   * [Liquibase](#liquibase)
   * [JWT (JSON Web Tokens)](#jwt-json-web-tokens)
   * [Apache Kafka](#apache-kafka)
@@ -99,12 +107,22 @@ Git — это инструмент, который помогает разра�
   указывает на
   последний коммит в текущей ветке.
 
+Подробнее о Git:
+1) [https://skillbox.ru/media/code/chto_takoe_git_obyasnyaem_na_skhemakh/](https://skillbox.ru/media/code/chto_takoe_git_obyasnyaem_na_skhemakh/)
+2) [https://habr.com/ru/articles/541258/](https://habr.com/ru/articles/541258/)
+3) [https://skillbox.ru/media/code/gitlab-chto-eto-takoe-i-kak-im-polzovatsya/](https://skillbox.ru/media/code/gitlab-chto-eto-takoe-i-kak-im-polzovatsya/)
+
+Потренироваться: [https://learngitbranching.js.org/?locale=ru_RU](https://learngitbranching.js.org/?locale=ru_RU)
+
 ### Git Flow
 
 Есть несколько правил и рекомендаций для организации работы с Git. Как правило, они выбираются в зависимости от проекта
 и зависят, например, от размера команды, частоты релизов и т.д. Подробнее про них можно почитать
-тут <https://bool.dev/blog/detail/git-branching-strategies>. Ниже перечислены основные названия и применение веток,
-которые могут быть применимы к разным flow.
+тут <https://bool.dev/blog/detail/git-branching-strategies>. О GitFlow:
+1) [https://habr.com/ru/articles/767424/](https://habr.com/ru/articles/767424/)
+2) [https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+
+Ниже перечислены основные названия и применение веток, которые могут быть применимы к разным flow.
 
 - `master`: Основная ветка, содержащая стабильный и готовый к выпуску код.
 - `develop`: Ветка для разработки, содержащая последний интегрированный код.
@@ -123,6 +141,107 @@ Git — это инструмент, который помогает разра�
 Sourcetree.
 
 Скачать <https://www.sourcetreeapp.com>
+
+### Тест для самопроверки по VCS
+
+[https://forms.gle/z8ai7Mrc4KqYrg5X9](https://forms.gle/RbBJpjFyN8Rco3Dp9)
+
+## Системы сборки
+Системы сборки — это такие программные продукты, которые на основе некоторой конфигурации могут «собрать» ваш проект.
+Под словом «собрать» здесь может скрываться очень обширный объем работы, который при «ручном» подходе требует значительных затрат времени.
+Небольшой перечень для ясности:
+- загрузить зависимые библиотеки для вашего проекта из сети (репозитория);
+- скомпилировать классы модуля или всего проекта;
+- сгенерировать дополнительные файлы: SQL-скрипты, XML-конфиги и т.п.;
+- удалять/создавать директории и копировать в них указанные файлы;
+- упаковка скомпилированных классов проекта в архивы различных форматов: zip, rar, rpm, jar, ear, war и др.;
+- компиляция и запуск модульных тестов (unit-test) вашего проекта с результатами выполнения тестов и расчетом процента покрытия;
+- установка (deploy) файлов проекта на удаленный сервер;
+- генерация документации и отчетов.
+
+Почитать о них можно тут: [https://zhukovsd.github.io/java-backend-learning-course/technologies/build-systems/](https://zhukovsd.github.io/java-backend-learning-course/technologies/build-systems/)
+
+### Maven
+
+**Описание:**
+Maven — это инструмент для управления проектами и автоматизации сборки, используемый в Java. Он предоставляет
+стандартизированный способ управления зависимостями, компиляции, тестирования и упаковки приложений. Maven использует
+файл конфигурации `pom.xml` (Project Object Model), который описывает проект, его зависимости, плагины и цели сборки.
+Дополнительно о Maven:
+1) [https://skillbox.ru/media/code/osnovy-maven-chto-eto-takoe-i-kak-rabotaet/](https://skillbox.ru/media/code/osnovy-maven-chto-eto-takoe-i-kak-rabotaet/)
+2) [https://habr.com/ru/articles/77382/](https://habr.com/ru/articles/77382/)
+
+Пример конфигурации `pom.xml` можно посмотреть в текущем проекте.
+
+### Тест для самопроверки по Maven
+
+[https://forms.gle/Mc9PgED66VZjj5XS6](https://forms.gle/Mc9PgED66VZjj5XS6)
+
+## Best practices in code and app architecture (pt. 1)
+
+Мы стараемся сразу писать красивый и понятный код. Это заключается в
+- правильной организации структуры проекта,
+- must-have практиках непосредственно написания кода.
+
+Начнем с архитектуры приложения (не путать с "архитектурой решения").
+
+Луковая, гексагональная, чистая архитектура - все эти архитектуры нацелены на создание модульных и масштабируемых приложений. Все они говорят об одном - приложение необходимо делить на слои, каждый из которых выполняет строго определенный набор функций. Главная цель такого подхода - обеспечить независимость и модульность компонентов, а также четкую организацию кода для оптимизации разработки, масштабирования и поддержки приложений.
+
+Подробнее:
+1) [https://dzen.ru/a/ZQ4Tl75l7WzI9Oii](https://dzen.ru/a/ZQ4Tl75l7WzI9Oii)
+2) [https://ru.hexlet.io/courses/java-web/lessons/mvc/theory_unit](https://ru.hexlet.io/courses/java-web/lessons/mvc/theory_unit)
+3) [https://alexkosarev.name/2018/07/27/n-tier-java-part1/](https://alexkosarev.name/2018/07/27/n-tier-java-part1/) (до слов "Разработка бизнес-логики")
+
+## IoC, DI, Spring
+
+Уже много лет "Инверсия управления" считается стандартом разработки. Мы не управляем ЖЦ создания компонентов, передавая эту ответственность различным фреймворкам, мы только указываем какой-то минимальный необходимый набор параметров для создания этих самых компонентов.
+
+### Теоретическая информация
+
+1) Что же такое IoC:
+- [https://alexkosarev.name/2019/06/20/ioc-di-and-dl/](https://alexkosarev.name/2019/06/20/ioc-di-and-dl/)
+- [https://www.baeldung.com/cs/ioc](https://www.baeldung.com/cs/ioc)
+2) DI является реализацией IoC:
+- [https://apptractor.ru/info/articles/dependency-injection.html](https://apptractor.ru/info/articles/dependency-injection.html)
+- [https://habr.com/ru/articles/434380/](https://habr.com/ru/articles/434380/)
+- Краткая сборная солянка: [https://habr.com/ru/articles/131993/](https://habr.com/ru/articles/131993/)
+3) Про Spring:
+- [https://blog.skillfactory.ru/glossary/spring/](https://blog.skillfactory.ru/glossary/spring/)
+- [https://habr.com/ru/articles/490586/](https://habr.com/ru/articles/490586/)
+- [https://skillbox.ru/media/code/freymvork-spring-zachem-on-nuzhen-kak-ustroen-i-kak-rabotaet/](https://skillbox.ru/media/code/freymvork-spring-zachem-on-nuzhen-kak-ustroen-i-kak-rabotaet/)
+
+### Тест для самопроверки по IoC
+
+[https://forms.gle/Jf1cNfAFUgjFFFSP9](https://forms.gle/Jf1cNfAFUgjFFFSP9)
+
+## Spring Boot
+
+Spring — это фреймворк для Java, на котором пишут веб-приложения и микросервисы. А Spring Boot — это расширение, которое упрощает и ускоряет работу со Spring. Оно представляет собой набор утилит, автоматизирующих настройки фреймворка.
+
+Spring Boot разработан для ускорения создания веб-приложений. Он отличается от своего «родителя» тем, что не требует сложной настройки и имеет ряд встроенных инструментов, упрощающих написание кода.
+
+В отличие от базового фреймворка, он умеет:
+- упаковывать зависимости в стандартные starter-пакеты;
+- автоматически конфигурировать приложения с помощью jar-зависимостей;
+- использовать JavaConfig, что позволяет отказаться от использования XML;
+- не зависеть от множественного импорта Maven и конфликтов версий, связанных с этим;
+- обеспечивать мощную пакетную обработку и управлять конечными точками RES;
+- упрощать интеграцию с другими Java-фреймворками, такими как JPA / Hibernate ORM, Struts и так далее;
+- локально запускать встроенные HTTP-серверы, такие как Tomcat и Jetty, упрощая разработку и тестирование веб-приложений.
+
+Почитать:
+
+1) [https://topjava.ru/blog/introducing-spring-boot](https://topjava.ru/blog/introducing-spring-boot)
+2) [https://gitverse.ru/blog/articles/development/198-chto-takoe-spring-boot-ego-preimushestva-i-kak-nachat-s-nim-rabotat](https://gitverse.ru/blog/articles/development/198-chto-takoe-spring-boot-ego-preimushestva-i-kak-nachat-s-nim-rabotat)
+3) [https://www.baeldung.com/spring-boot-start](https://www.baeldung.com/spring-boot-start)
+
+В статьях упоминаются сервлеты и контейнеры сервлетов, котортко о них:
+1) [https://blog.skillfactory.ru/glossary/servlet/](https://blog.skillfactory.ru/glossary/servlet/)
+2) [https://blog.skillfactory.ru/glossary/apache-tomcat/](https://blog.skillfactory.ru/glossary/apache-tomcat/)
+
+Дополнительно:
+1) [https://www.baeldung.com/spring-boot-yaml-vs-properties](https://www.baeldung.com/spring-boot-yaml-vs-properties)
+2) [https://habr.com/ru/articles/740802/](https://habr.com/ru/articles/740802/)
 
 ## Создание проекта, структура
 
