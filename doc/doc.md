@@ -13,13 +13,20 @@
     * [Теоретическая информация](#теоретическая-информация)
     * [Тест для самопроверки по IoC](#тест-для-самопроверки-по-ioc)
   * [Spring Boot](#spring-boot)
+  * [Best practices in code and app architecture (pt. 2)](#best-practices-in-code-and-app-architecture-pt-2)
+    * [Что считаем красивым кодом](#что-считаем-красивым-кодом)
+    * [Тест для самопроверки по BP](#тест-для-самопроверки-по-bp)
+  * [БД и миграции](#бд-и-миграции)
+  * [ORM, JPA](#orm-jpa)
+  * [Ресурсы](#ресурсы)
+    * [Rest](#rest)
+    * [DTO](#dto)
+    * [OpenAPI](#openapi)
 * [Создание проекта, структура](#создание-проекта-структура)
   * [Создание основного проекта](#создание-основного-проекта)
   * [Многомодульная структура](#многомодульная-структура)
-  * [Liquibase](#liquibase)
   * [JWT (JSON Web Tokens)](#jwt-json-web-tokens)
   * [Apache Kafka](#apache-kafka)
-  * [Swagger (Springdoc)](#swagger-springdoc)
   * [Spring Security](#spring-security)
   * [FeignClient](#feignclient)
   * [Specifications](#specifications)
@@ -242,6 +249,115 @@ Spring Boot разработан для ускорения создания ве
 Дополнительно:
 1) [https://www.baeldung.com/spring-boot-yaml-vs-properties](https://www.baeldung.com/spring-boot-yaml-vs-properties)
 2) [https://habr.com/ru/articles/740802/](https://habr.com/ru/articles/740802/)
+
+## Best practices in code and app architecture (pt. 2)
+
+### Что считаем красивым кодом
+
+1) О коде, все мб и не запомните, но какие-то простые вещи быстро ложатся в голову:
+- [https://www.baeldung.com/java-clean-code](https://www.baeldung.com/java-clean-code)
+- [https://docs.oracle.com/cd/A97688_16/generic.903/bp/java.htm](https://docs.oracle.com/cd/A97688_16/generic.903/bp/java.htm)
+- [https://blog.jetbrains.com/idea/2024/02/java-best-practices/](https://blog.jetbrains.com/idea/2024/02/java-best-practices/)
+- [https://www.tatvasoft.com/blog/java-best-practices/](https://www.tatvasoft.com/blog/java-best-practices/)
+- [https://habr.com/ru/companies/piter/articles/676394/](https://habr.com/ru/companies/piter/articles/676394/)
+
+Кроме того, нужно в IDEa поставить себе плагин SonarLint - это обертка над SonarQube(платформа для непрерывного анализа и измерения качества программного кода, разработанную компанией SonarSource). Сейчас SonarQube является чем-то вроде отраслевого стандарта. В своей работе SonarQube использует статический анализ кода: реальное его выполнение не требуется, так как анализируются именно «исходники». Предмет анализа этого инструмента — потенциальные ошибки и уязвимости, стандарты оформления кода, наличие тестов и уровень покрытия ими, а также дублирование кода и его поддерживаемость. Будет вам "в прямом эфире" помогать писать красиво.
+
+2) Весьма приветствуется писать код в функциональном стиле.
+- [https://skillbox.ru/media/base/funktsionalnye_interfeysy_i_lyambda_vyrazheniya_v_java/](https://skillbox.ru/media/base/funktsionalnye_interfeysy_i_lyambda_vyrazheniya_v_java/)
+- [https://struchkov.dev/blog/ru/optional-in-java/](https://struchkov.dev/blog/ru/optional-in-java/)
+- [https://habr.com/ru/articles/658457/](https://habr.com/ru/articles/658457/)
+- [https://skillbox.ru/media/base/java-stream-api-kopilka-retseptov/](https://skillbox.ru/media/base/java-stream-api-kopilka-retseptov/)
+- [https://youtu.be/Fswgne8y0GY?si=tB-DFQ_TupxliaOD](https://youtu.be/Fswgne8y0GY?si=tB-DFQ_TupxliaOD)
+- [https://www.youtube.com/live/3qrNlWkJ3ac?si=rA-xBYkFMPWJlG_s](https://www.youtube.com/live/3qrNlWkJ3ac?si=rA-xBYkFMPWJlG_s)
+- [https://www.baeldung.com/java-8-streams](https://www.baeldung.com/java-8-streams)
+- [https://www.tpointtech.com/java-8-stream](https://www.tpointtech.com/java-8-stream) - как напоминалка, что есть (см. раздел Core Operations Over Streams)
+
+### Тест для самопроверки по BP
+
+[https://forms.gle/t8zrEoNkGX2nArr98](https://forms.gle/t8zrEoNkGX2nArr98)
+
+## БД и миграции
+
+По мере разработки и поддержки приложения база данных изменяется: добавляются таблицы, столбцы и т.д. В современных проектах тех. требования вырабатываются поэтапно, поэтому очень маловероятно, что вы сможете с самого начала точно угадать со структурой модели базы данных. Изменения, которые мы делаем в базе данных, меняют способ хранения в ней информации, устанавливают новые способы хранения или удаляют хранилище, которое больше не нужно. Для упрощения отслеживания этих изменений существуют специальные системы, управляющие миграциями БД.
+
+Самое простое объяснение - это аналог git, только версионированию подвергнута структура базы данных, в некоторых случаях ее базовое наполнение. Миграции слой за слоем последовательно “накатываются” в базу данных в известном порядке. Если в базе уже есть часть выполненных миграций, то будут использоваться только новые.
+Информация, какие миграции были применены к базе данных, по умолчанию находится в этой же БД, в специальной таблице.
+
+### Почитать о миграциях и системах контроля версий
+
+- [https://struchkov.dev/blog/ru/get-started-liquibase/](https://struchkov.dev/blog/ru/get-started-liquibase/)
+- [https://tproger.ru/articles/migracii-baz-dannyh-s-pomoshhju-biblioteki-liquibase](https://tproger.ru/articles/migracii-baz-dannyh-s-pomoshhju-biblioteki-liquibase)
+- [https://habr.com/ru/companies/otus/articles/532978/](https://habr.com/ru/companies/otus/articles/532978/)
+- [https://www.baeldung.com/liquibase-vs-flyway](https://www.baeldung.com/liquibase-vs-flyway)
+- [https://for-each.dev/lessons/b/-liquibase-refactor-schema-of-java-app](https://for-each.dev/lessons/b/-liquibase-refactor-schema-of-java-app)
+- [https://habr.com/ru/articles/540500/](https://habr.com/ru/articles/540500/)
+
+Мы будем работать в наших проектах с liquibase:
+- [Liquibase Official Documentation](https://www.liquibase.org/documentation/index.html)
+
+Поднять контейнер с postgres в docker:
+
+```
+docker run --name ed-app -p 5432:5432 -e POSTGRES_USER=sys -e POSTGRES_PASSWORD=password postgres:13.3
+```
+
+здесь: ed-app - имя контейнера, 5432 - стандартный порт, который занимает postgres (5432:5432 - это прокидывание порта из контейнера на такой же порт основного пространства вашего компа), POSTGRES_USER - root пользователь, POSTGRES_PASSWORD - root пароль, postgres:13.3 - имя образа с указанием версии
+
+Запустить миграции без запуска проекта можно командой:
+
+```
+mvn install liquibase:update -f <имя-модуля-db>/pom.xml -Dliquibase.host=localhost -Dliquibase.port=5432 -Dliquibase.db=postgres -Dliquibase.schema=<имя-схемы-которую-создадите> -Dliquibase.user=sys -Dliquibase.password=password
+```
+
+## ORM, JPA
+
+Мы знаем, что в приложениях необходимо обеспечить работу с данными в терминах классов, а не таблиц данных и напротив, преобразовать термины и данные классов в данные, пригодные для хранения в СУБД. Необходимо также обеспечить интерфейс для CRUD-операций над данными. Для этого у нас есть ORM.
+
+Короткая напоминалка:
+- [https://blog.skillfactory.ru/glossary/orm/](https://blog.skillfactory.ru/glossary/orm/)
+
+Есть несколько реализаций этой технологии, в Spring мы стандартно пользуемся JPA:
+- [https://habr.com/ru/companies/otus/articles/686082/](https://habr.com/ru/companies/otus/articles/686082/)
+- [https://www.baeldung.com/the-persistence-layer-with-spring-data-jpa](https://www.baeldung.com/the-persistence-layer-with-spring-data-jpa)
+- [https://docs.spring.io/spring-data/jpa/reference/jpa/getting-started.html](https://docs.spring.io/spring-data/jpa/reference/jpa/getting-started.html)
+
+## Ресурсы
+
+### REST
+
+REST API (Representational State Transfer) – это архитектурный подход, описывающий рамки взаимодействия с API (распределенного приложения в сети). Это не протокол, а скорее список рекомендаций.
+
+API (Application Programming Interface) представляет собой набор определений и протоколов. Разработчики создают API-интерфейсы для взаимодействия и обмена данными одного приложения или сайта с другими. API функционирует как своеобразный шлюз или посредник между клиентами и сервером.
+
+Интерфейс API разрабатывается таким образом, чтобы программное обеспечение могло запросить определенный тип данных через сеть. Интерфейс совместим с любыми языками программирования, операционными системами, программами, сайтами, приложениями, flash и т.д.
+
+Почитать:
+- [https://systems.education/what-is-rest#showmore](https://systems.education/what-is-rest#showmore)
+- [https://skillbox.ru/media/code/rest-api-chto-eto-takoe-i-kak-rabotaet/](https://skillbox.ru/media/code/rest-api-chto-eto-takoe-i-kak-rabotaet/)
+- [https://blog.skillfactory.ru/glossary/rest-api/](https://blog.skillfactory.ru/glossary/rest-api/)
+
+### DTO
+
+Зачастую, в клиент-серверных приложениях, данные на клиенте (слой представления) и на сервере (слой бизнес логики) структурируются по-разному. На стороне сервера это дает нам возможность комфортно хранить данные в базе данных или оптимизировать использование данных в угоду производительности, в то же время заниматься user-friendly отображением данных на клиенте.
+
+Что такое DTO и чем отличается от других объектов:
+- [https://sky.pro/media/razlichiya-mezhdu-dto-vo-pojo-javabeans/](https://sky.pro/media/razlichiya-mezhdu-dto-vo-pojo-javabeans/)
+
+В целом, мы можем перекладывать данные из одного объекта в другой в "ручном" режиме, но можем и автоматизировать этот процесс с помощью библиотек. Например, Mapstruct:
+- [https://habr.com/ru/articles/818489/](https://habr.com/ru/articles/818489/)
+- [https://www.baeldung.com/mapstruct](https://www.baeldung.com/mapstruct)
+
+### OpenAPI
+
+Springdoc OpenAPI — это библиотека, которая автоматизирует генерацию документации OpenAPI 3.0 для RESTful API, реализованных на основе Spring Boot. Она предоставляет аннотации и конфигурации для легкой интеграции и генерации спецификации API на основе кода. 
+
+В целом, Swagger (a.k.a. OpenAPI) — это набор инструментов, который позволяет автоматически описывать API на основе кода **или** правил. В кросс-функциональных командах, работающих по скраму, важно быстро реализовывать фичи за один спринт. У нас нет времени ждать, когда бэк будет готов, чтобы фронт или мобилка приступили к своей реализации. Тут на помощь аналитикам приходит Swagger: он позволяет публиковать контракт API, что дает возможность всем разработчикам — бэкенд, фронтенд и мобильным — работать параллельно.
+
+Дополнительно:
+- [https://community.exolve.ru/blog/swagger-chto-eto-kak-rabotat-s-dokumentatsiey/](https://community.exolve.ru/blog/swagger-chto-eto-kak-rabotat-s-dokumentatsiey/)
+- [Springdoc OpenAPI Official Documentation](https://springdoc.org/)
+- [Spring Boot + Springdoc OpenAPI Integration Example](https://www.baeldung.com/spring-rest-openapi-documentation)
 
 # Создание проекта, структура
 
