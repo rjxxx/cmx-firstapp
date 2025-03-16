@@ -388,7 +388,7 @@ Springdoc OpenAPI — это библиотека, которая автомат
 
 Spring Security значительно упрощает защиту корпоративных приложений, разработанных на Java. Этот мощный фреймворк обеспечивает защиту проекта, предоставляя готовые к использованию функции, которые помогут вам реализовать надежную авторизацию и аутентификацию.
 
-Мы сделаем Basic Auth в наших приложениях, как это должно быть в Spring:
+Как реализовать Basic Auth в в Spring:
 
 - [https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html)
 - [https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html](https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html)
@@ -397,7 +397,7 @@ Spring Security значительно упрощает защиту корпо�
 
 ## Security (pt.2)
 
-В прошлый раз мы сделали блок по аутентификации пользователя в системе, но никаких прав ему не раздавали, т.е. прямо сейчас любому аутентифицированному пользователю доступны любые ресурсы. Давайте усложним задачу.
+Помиму аутентификации в приложении необходимо производить разграничение доступа к ресурсам и операциям на основании прав пользователя. За это отвечает авторизация.
 
 ### Авторизация
 
