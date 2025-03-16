@@ -18,10 +18,18 @@
     * [Тест для самопроверки по BP](#тест-для-самопроверки-по-bp)
   * [БД и миграции](#бд-и-миграции)
   * [ORM, JPA](#orm-jpa)
+    * [Тест для самопроверки по работе с БД](#тест-для-самопроверки-по-работе-с-БД)
   * [Ресурсы](#ресурсы)
     * [Rest](#rest)
     * [DTO](#dto)
     * [OpenAPI](#openapi)
+    * [Тест для самопроверки по ресурсам](#тест-для-самопроверки-по-ресурсам)
+  * [Security (pt.1)](#security-pt1)
+    * [Аутентификация](#аутентификация)
+    * [Spring Security](#spring-security)
+  * [Security (pt.2)](#security-pt2)
+    * [Авторизация](#авторизация)
+    * [Тест для самопроверки по Spring Security](#тест-для-самопроверки-по-spring-security)
 * [Создание проекта, структура](#создание-проекта-структура)
   * [Создание основного проекта](#создание-основного-проекта)
   * [Многомодульная структура](#многомодульная-структура)
@@ -322,6 +330,10 @@ mvn install liquibase:update -f <имя-модуля-db>/pom.xml -Dliquibase.hos
 - [https://www.baeldung.com/the-persistence-layer-with-spring-data-jpa](https://www.baeldung.com/the-persistence-layer-with-spring-data-jpa)
 - [https://docs.spring.io/spring-data/jpa/reference/jpa/getting-started.html](https://docs.spring.io/spring-data/jpa/reference/jpa/getting-started.html)
 
+### Тест для самопроверки по работе с БД
+
+[https://forms.gle/xf8Lgn7h5gNHENFy8](https://forms.gle/xf8Lgn7h5gNHENFy8)
+
 ## Ресурсы
 
 ### REST
@@ -358,6 +370,47 @@ Springdoc OpenAPI — это библиотека, которая автомат
 - [https://community.exolve.ru/blog/swagger-chto-eto-kak-rabotat-s-dokumentatsiey/](https://community.exolve.ru/blog/swagger-chto-eto-kak-rabotat-s-dokumentatsiey/)
 - [Springdoc OpenAPI Official Documentation](https://springdoc.org/)
 - [Spring Boot + Springdoc OpenAPI Integration Example](https://www.baeldung.com/spring-rest-openapi-documentation)
+
+### Тест для самопроверки по ресурсам
+
+[https://forms.gle/udWxkuBDnZnHytTN9](https://forms.gle/udWxkuBDnZnHytTN9)
+
+## Security (pt.1)
+
+### Аутентификация
+
+- [https://habr.com/ru/articles/720842/](https://habr.com/ru/articles/720842/)
+- [https://www.unisender.com/ru/glossary/chto-takoe-email-autentifikaciya/#anchor-1](https://www.unisender.com/ru/glossary/chto-takoe-email-autentifikaciya/#anchor-1)
+- [https://infostart.ru/1c/articles/2035437/](https://infostart.ru/1c/articles/2035437/)
+- [https://zuplo.com/blog/2025/01/03/top-7-api-authentication-methods-compared](https://zuplo.com/blog/2025/01/03/top-7-api-authentication-methods-compared)
+
+### Spring Security
+
+Spring Security значительно упрощает защиту корпоративных приложений, разработанных на Java. Этот мощный фреймворк обеспечивает защиту проекта, предоставляя готовые к использованию функции, которые помогут вам реализовать надежную авторизацию и аутентификацию.
+
+Мы сделаем Basic Auth в наших приложениях, как это должно быть в Spring:
+
+- [https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html)
+- [https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html](https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html)
+- [https://jstobigdata.com/spring-security/the-ultimate-guide-to-spring-security-basic-authentication/#toc_5_Integrating_Basic_Authentication_with_a_User_Store](https://jstobigdata.com/spring-security/the-ultimate-guide-to-spring-security-basic-authentication/#toc_5_Integrating_Basic_Authentication_with_a_User_Store)
+- [https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#servlet-authentication-unpwd](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#servlet-authentication-unpwd) (см. до Create a @RestController for Authentication)
+
+## Security (pt.2)
+
+В прошлый раз мы сделали блок по аутентификации пользователя в системе, но никаких прав ему не раздавали, т.е. прямо сейчас любому аутентифицированному пользователю доступны любые ресурсы. Давайте усложним задачу.
+
+### Авторизация
+
+- [https://www.baeldung.com/spring-security-expressions](https://www.baeldung.com/spring-security-expressions)
+- [https://docs.spring.io/spring-security/site/docs/4.0.x/reference/html/el-access.html](https://docs.spring.io/spring-security/site/docs/4.0.x/reference/html/el-access.html)
+- [https://sysout.ru/zashhita-metodov-annotatsiya-preauthorize/](https://sysout.ru/zashhita-metodov-annotatsiya-preauthorize/)
+- [https://www.geeksforgeeks.org/difference-between-hasrole-and-hasauthority-in-spring-security/](https://www.geeksforgeeks.org/difference-between-hasrole-and-hasauthority-in-spring-security/)
+- [https://www.baeldung.com/spring-security-custom-filter](https://www.baeldung.com/spring-security-custom-filter)
+
+### Тест для самопроверки по Spring Security
+
+[https://forms.gle/MtdY99JPLitgfkqq6](https://forms.gle/MtdY99JPLitgfkqq6)
+
 
 # Создание проекта, структура
 
