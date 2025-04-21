@@ -4,14 +4,37 @@
     * [Основные понятия и команды](#основные-понятия-и-команды)
     * [Git Flow](#git-flow)
     * [Графическая оболочка для работы с git](#графическая-оболочка-для-работы-с-git)
-  * [Создание проекта, структура](#создание-проекта-структура)
-    * [Создание основного проекта](#создание-основного-проекта)
-    * [Многомодульная структура](#многомодульная-структура)
-  * [Maven](#maven)
-  * [Liquibase](#liquibase)
+    * [Тест для самопроверки по VCS](#тест-для-самопроверки-по-vcs)
+  * [Системы сборки](#системы-сборки)
+    * [Maven](#maven)
+    * [Тест для самопроверки по Maven](#тест-для-самопроверки-по-maven)
+  * [Best practices in code and app architecture (pt. 1)](#best-practices-in-code-and-app-architecture-pt-1)
+  * [IoC, DI, Spring](#ioc-di-spring)
+    * [Теоретическая информация](#теоретическая-информация)
+    * [Тест для самопроверки по IoC](#тест-для-самопроверки-по-ioc)
+  * [Spring Boot](#spring-boot)
+  * [Best practices in code and app architecture (pt. 2)](#best-practices-in-code-and-app-architecture-pt-2)
+    * [Что считаем красивым кодом](#что-считаем-красивым-кодом)
+    * [Тест для самопроверки по BP](#тест-для-самопроверки-по-bp)
+  * [БД и миграции](#бд-и-миграции)
+  * [ORM, JPA](#orm-jpa)
+    * [Тест для самопроверки по работе с БД](#тест-для-самопроверки-по-работе-с-БД)
+  * [Ресурсы](#ресурсы)
+    * [Rest](#rest)
+    * [DTO](#dto)
+    * [OpenAPI](#openapi)
+    * [Тест для самопроверки по ресурсам](#тест-для-самопроверки-по-ресурсам)
+  * [Security (pt.1)](#security-pt1)
+    * [Аутентификация](#аутентификация)
+    * [Spring Security](#spring-security)
+  * [Security (pt.2)](#security-pt2)
+    * [Авторизация](#авторизация)
+    * [Тест для самопроверки по Spring Security](#тест-для-самопроверки-по-spring-security)
+* [Создание проекта, структура](#создание-проекта-структура)
+  * [Создание основного проекта](#создание-основного-проекта)
+  * [Многомодульная структура](#многомодульная-структура)
   * [JWT (JSON Web Tokens)](#jwt-json-web-tokens)
   * [Apache Kafka](#apache-kafka)
-  * [Swagger (Springdoc)](#swagger-springdoc)
   * [Spring Security](#spring-security)
   * [FeignClient](#feignclient)
   * [Specifications](#specifications)
@@ -99,12 +122,22 @@ Git — это инструмент, который помогает разра�
   указывает на
   последний коммит в текущей ветке.
 
+Подробнее о Git:
+1) [https://skillbox.ru/media/code/chto_takoe_git_obyasnyaem_na_skhemakh/](https://skillbox.ru/media/code/chto_takoe_git_obyasnyaem_na_skhemakh/)
+2) [https://habr.com/ru/articles/541258/](https://habr.com/ru/articles/541258/)
+3) [https://skillbox.ru/media/code/gitlab-chto-eto-takoe-i-kak-im-polzovatsya/](https://skillbox.ru/media/code/gitlab-chto-eto-takoe-i-kak-im-polzovatsya/)
+
+Потренироваться: [https://learngitbranching.js.org/?locale=ru_RU](https://learngitbranching.js.org/?locale=ru_RU)
+
 ### Git Flow
 
 Есть несколько правил и рекомендаций для организации работы с Git. Как правило, они выбираются в зависимости от проекта
 и зависят, например, от размера команды, частоты релизов и т.д. Подробнее про них можно почитать
-тут <https://bool.dev/blog/detail/git-branching-strategies>. Ниже перечислены основные названия и применение веток,
-которые могут быть применимы к разным flow.
+тут <https://bool.dev/blog/detail/git-branching-strategies>. О GitFlow:
+1) [https://habr.com/ru/articles/767424/](https://habr.com/ru/articles/767424/)
+2) [https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+
+Ниже перечислены основные названия и применение веток, которые могут быть применимы к разным flow.
 
 - `master`: Основная ветка, содержащая стабильный и готовый к выпуску код.
 - `develop`: Ветка для разработки, содержащая последний интегрированный код.
@@ -124,9 +157,264 @@ Sourcetree.
 
 Скачать <https://www.sourcetreeapp.com>
 
-## Создание проекта, структура
+### Тест для самопроверки по VCS
 
-### Создание основного проекта
+[https://forms.gle/z8ai7Mrc4KqYrg5X9](https://forms.gle/RbBJpjFyN8Rco3Dp9)
+
+## Системы сборки
+Системы сборки — это такие программные продукты, которые на основе некоторой конфигурации могут «собрать» ваш проект.
+Под словом «собрать» здесь может скрываться очень обширный объем работы, который при «ручном» подходе требует значительных затрат времени.
+Небольшой перечень для ясности:
+- загрузить зависимые библиотеки для вашего проекта из сети (репозитория);
+- скомпилировать классы модуля или всего проекта;
+- сгенерировать дополнительные файлы: SQL-скрипты, XML-конфиги и т.п.;
+- удалять/создавать директории и копировать в них указанные файлы;
+- упаковка скомпилированных классов проекта в архивы различных форматов: zip, rar, rpm, jar, ear, war и др.;
+- компиляция и запуск модульных тестов (unit-test) вашего проекта с результатами выполнения тестов и расчетом процента покрытия;
+- установка (deploy) файлов проекта на удаленный сервер;
+- генерация документации и отчетов.
+
+Почитать о них можно тут: [https://zhukovsd.github.io/java-backend-learning-course/technologies/build-systems/](https://zhukovsd.github.io/java-backend-learning-course/technologies/build-systems/)
+
+### Maven
+
+**Описание:**
+Maven — это инструмент для управления проектами и автоматизации сборки, используемый в Java. Он предоставляет
+стандартизированный способ управления зависимостями, компиляции, тестирования и упаковки приложений. Maven использует
+файл конфигурации `pom.xml` (Project Object Model), который описывает проект, его зависимости, плагины и цели сборки.
+Дополнительно о Maven:
+1) [https://skillbox.ru/media/code/osnovy-maven-chto-eto-takoe-i-kak-rabotaet/](https://skillbox.ru/media/code/osnovy-maven-chto-eto-takoe-i-kak-rabotaet/)
+2) [https://habr.com/ru/articles/77382/](https://habr.com/ru/articles/77382/)
+
+Пример конфигурации `pom.xml` можно посмотреть в текущем проекте.
+
+### Тест для самопроверки по Maven
+
+[https://forms.gle/Mc9PgED66VZjj5XS6](https://forms.gle/Mc9PgED66VZjj5XS6)
+
+## Best practices in code and app architecture (pt. 1)
+
+Мы стараемся сразу писать красивый и понятный код. Это заключается в
+- правильной организации структуры проекта,
+- must-have практиках непосредственно написания кода.
+
+Начнем с архитектуры приложения (не путать с "архитектурой решения").
+
+Луковая, гексагональная, чистая архитектура - все эти архитектуры нацелены на создание модульных и масштабируемых приложений. Все они говорят об одном - приложение необходимо делить на слои, каждый из которых выполняет строго определенный набор функций. Главная цель такого подхода - обеспечить независимость и модульность компонентов, а также четкую организацию кода для оптимизации разработки, масштабирования и поддержки приложений.
+
+Подробнее:
+1) [https://dzen.ru/a/ZQ4Tl75l7WzI9Oii](https://dzen.ru/a/ZQ4Tl75l7WzI9Oii)
+2) [https://ru.hexlet.io/courses/java-web/lessons/mvc/theory_unit](https://ru.hexlet.io/courses/java-web/lessons/mvc/theory_unit)
+3) [https://alexkosarev.name/2018/07/27/n-tier-java-part1/](https://alexkosarev.name/2018/07/27/n-tier-java-part1/) (до слов "Разработка бизнес-логики")
+
+## IoC, DI, Spring
+
+Уже много лет "Инверсия управления" считается стандартом разработки. Мы не управляем ЖЦ создания компонентов, передавая эту ответственность различным фреймворкам, мы только указываем какой-то минимальный необходимый набор параметров для создания этих самых компонентов.
+
+### Теоретическая информация
+
+1) Что же такое IoC:
+- [https://alexkosarev.name/2019/06/20/ioc-di-and-dl/](https://alexkosarev.name/2019/06/20/ioc-di-and-dl/)
+- [https://www.baeldung.com/cs/ioc](https://www.baeldung.com/cs/ioc)
+2) DI является реализацией IoC:
+- [https://apptractor.ru/info/articles/dependency-injection.html](https://apptractor.ru/info/articles/dependency-injection.html)
+- [https://habr.com/ru/articles/434380/](https://habr.com/ru/articles/434380/)
+- Краткая сборная солянка: [https://habr.com/ru/articles/131993/](https://habr.com/ru/articles/131993/)
+3) Про Spring:
+- [https://blog.skillfactory.ru/glossary/spring/](https://blog.skillfactory.ru/glossary/spring/)
+- [https://habr.com/ru/articles/490586/](https://habr.com/ru/articles/490586/)
+- [https://skillbox.ru/media/code/freymvork-spring-zachem-on-nuzhen-kak-ustroen-i-kak-rabotaet/](https://skillbox.ru/media/code/freymvork-spring-zachem-on-nuzhen-kak-ustroen-i-kak-rabotaet/)
+
+### Тест для самопроверки по IoC
+
+[https://forms.gle/Jf1cNfAFUgjFFFSP9](https://forms.gle/Jf1cNfAFUgjFFFSP9)
+
+## Spring Boot
+
+Spring — это фреймворк для Java, на котором пишут веб-приложения и микросервисы. А Spring Boot — это расширение, которое упрощает и ускоряет работу со Spring. Оно представляет собой набор утилит, автоматизирующих настройки фреймворка.
+
+Spring Boot разработан для ускорения создания веб-приложений. Он отличается от своего «родителя» тем, что не требует сложной настройки и имеет ряд встроенных инструментов, упрощающих написание кода.
+
+В отличие от базового фреймворка, он умеет:
+- упаковывать зависимости в стандартные starter-пакеты;
+- автоматически конфигурировать приложения с помощью jar-зависимостей;
+- использовать JavaConfig, что позволяет отказаться от использования XML;
+- не зависеть от множественного импорта Maven и конфликтов версий, связанных с этим;
+- обеспечивать мощную пакетную обработку и управлять конечными точками RES;
+- упрощать интеграцию с другими Java-фреймворками, такими как JPA / Hibernate ORM, Struts и так далее;
+- локально запускать встроенные HTTP-серверы, такие как Tomcat и Jetty, упрощая разработку и тестирование веб-приложений.
+
+Почитать:
+
+1) [https://topjava.ru/blog/introducing-spring-boot](https://topjava.ru/blog/introducing-spring-boot)
+2) [https://gitverse.ru/blog/articles/development/198-chto-takoe-spring-boot-ego-preimushestva-i-kak-nachat-s-nim-rabotat](https://gitverse.ru/blog/articles/development/198-chto-takoe-spring-boot-ego-preimushestva-i-kak-nachat-s-nim-rabotat)
+3) [https://www.baeldung.com/spring-boot-start](https://www.baeldung.com/spring-boot-start)
+
+В статьях упоминаются сервлеты и контейнеры сервлетов, котортко о них:
+1) [https://blog.skillfactory.ru/glossary/servlet/](https://blog.skillfactory.ru/glossary/servlet/)
+2) [https://blog.skillfactory.ru/glossary/apache-tomcat/](https://blog.skillfactory.ru/glossary/apache-tomcat/)
+
+Дополнительно:
+1) [https://www.baeldung.com/spring-boot-yaml-vs-properties](https://www.baeldung.com/spring-boot-yaml-vs-properties)
+2) [https://habr.com/ru/articles/740802/](https://habr.com/ru/articles/740802/)
+
+## Best practices in code and app architecture (pt. 2)
+
+### Что считаем красивым кодом
+
+1) О коде, все мб и не запомните, но какие-то простые вещи быстро ложатся в голову:
+- [https://www.baeldung.com/java-clean-code](https://www.baeldung.com/java-clean-code)
+- [https://docs.oracle.com/cd/A97688_16/generic.903/bp/java.htm](https://docs.oracle.com/cd/A97688_16/generic.903/bp/java.htm)
+- [https://blog.jetbrains.com/idea/2024/02/java-best-practices/](https://blog.jetbrains.com/idea/2024/02/java-best-practices/)
+- [https://www.tatvasoft.com/blog/java-best-practices/](https://www.tatvasoft.com/blog/java-best-practices/)
+- [https://habr.com/ru/companies/piter/articles/676394/](https://habr.com/ru/companies/piter/articles/676394/)
+
+Кроме того, нужно в IDEa поставить себе плагин SonarLint - это обертка над SonarQube(платформа для непрерывного анализа и измерения качества программного кода, разработанную компанией SonarSource). Сейчас SonarQube является чем-то вроде отраслевого стандарта. В своей работе SonarQube использует статический анализ кода: реальное его выполнение не требуется, так как анализируются именно «исходники». Предмет анализа этого инструмента — потенциальные ошибки и уязвимости, стандарты оформления кода, наличие тестов и уровень покрытия ими, а также дублирование кода и его поддерживаемость. Будет вам "в прямом эфире" помогать писать красиво.
+
+2) Весьма приветствуется писать код в функциональном стиле.
+- [https://skillbox.ru/media/base/funktsionalnye_interfeysy_i_lyambda_vyrazheniya_v_java/](https://skillbox.ru/media/base/funktsionalnye_interfeysy_i_lyambda_vyrazheniya_v_java/)
+- [https://struchkov.dev/blog/ru/optional-in-java/](https://struchkov.dev/blog/ru/optional-in-java/)
+- [https://habr.com/ru/articles/658457/](https://habr.com/ru/articles/658457/)
+- [https://skillbox.ru/media/base/java-stream-api-kopilka-retseptov/](https://skillbox.ru/media/base/java-stream-api-kopilka-retseptov/)
+- [https://youtu.be/Fswgne8y0GY?si=tB-DFQ_TupxliaOD](https://youtu.be/Fswgne8y0GY?si=tB-DFQ_TupxliaOD)
+- [https://www.youtube.com/live/3qrNlWkJ3ac?si=rA-xBYkFMPWJlG_s](https://www.youtube.com/live/3qrNlWkJ3ac?si=rA-xBYkFMPWJlG_s)
+- [https://www.baeldung.com/java-8-streams](https://www.baeldung.com/java-8-streams)
+- [https://www.tpointtech.com/java-8-stream](https://www.tpointtech.com/java-8-stream) - как напоминалка, что есть (см. раздел Core Operations Over Streams)
+
+### Тест для самопроверки по BP
+
+[https://forms.gle/t8zrEoNkGX2nArr98](https://forms.gle/t8zrEoNkGX2nArr98)
+
+## БД и миграции
+
+По мере разработки и поддержки приложения база данных изменяется: добавляются таблицы, столбцы и т.д. В современных проектах тех. требования вырабатываются поэтапно, поэтому очень маловероятно, что вы сможете с самого начала точно угадать со структурой модели базы данных. Изменения, которые мы делаем в базе данных, меняют способ хранения в ней информации, устанавливают новые способы хранения или удаляют хранилище, которое больше не нужно. Для упрощения отслеживания этих изменений существуют специальные системы, управляющие миграциями БД.
+
+Самое простое объяснение - это аналог git, только версионированию подвергнута структура базы данных, в некоторых случаях ее базовое наполнение. Миграции слой за слоем последовательно “накатываются” в базу данных в известном порядке. Если в базе уже есть часть выполненных миграций, то будут использоваться только новые.
+Информация, какие миграции были применены к базе данных, по умолчанию находится в этой же БД, в специальной таблице.
+
+### Почитать о миграциях и системах контроля версий
+
+- [https://struchkov.dev/blog/ru/get-started-liquibase/](https://struchkov.dev/blog/ru/get-started-liquibase/)
+- [https://tproger.ru/articles/migracii-baz-dannyh-s-pomoshhju-biblioteki-liquibase](https://tproger.ru/articles/migracii-baz-dannyh-s-pomoshhju-biblioteki-liquibase)
+- [https://habr.com/ru/companies/otus/articles/532978/](https://habr.com/ru/companies/otus/articles/532978/)
+- [https://www.baeldung.com/liquibase-vs-flyway](https://www.baeldung.com/liquibase-vs-flyway)
+- [https://for-each.dev/lessons/b/-liquibase-refactor-schema-of-java-app](https://for-each.dev/lessons/b/-liquibase-refactor-schema-of-java-app)
+- [https://habr.com/ru/articles/540500/](https://habr.com/ru/articles/540500/)
+
+Мы будем работать в наших проектах с liquibase:
+- [Liquibase Official Documentation](https://www.liquibase.org/documentation/index.html)
+
+Поднять контейнер с postgres в docker:
+
+```
+docker run --name ed-app -p 5432:5432 -e POSTGRES_USER=sys -e POSTGRES_PASSWORD=password postgres:13.3
+```
+
+здесь: ed-app - имя контейнера, 5432 - стандартный порт, который занимает postgres (5432:5432 - это прокидывание порта из контейнера на такой же порт основного пространства вашего компа), POSTGRES_USER - root пользователь, POSTGRES_PASSWORD - root пароль, postgres:13.3 - имя образа с указанием версии
+
+Запустить миграции без запуска проекта можно командой:
+
+```
+mvn install liquibase:update -f <имя-модуля-db>/pom.xml -Dliquibase.host=localhost -Dliquibase.port=5432 -Dliquibase.db=postgres -Dliquibase.schema=<имя-схемы-которую-создадите> -Dliquibase.user=sys -Dliquibase.password=password
+```
+
+## ORM, JPA
+
+Мы знаем, что в приложениях необходимо обеспечить работу с данными в терминах классов, а не таблиц данных и напротив, преобразовать термины и данные классов в данные, пригодные для хранения в СУБД. Необходимо также обеспечить интерфейс для CRUD-операций над данными. Для этого у нас есть ORM.
+
+Короткая напоминалка:
+- [https://blog.skillfactory.ru/glossary/orm/](https://blog.skillfactory.ru/glossary/orm/)
+
+Есть несколько реализаций этой технологии, в Spring мы стандартно пользуемся JPA:
+- [https://habr.com/ru/companies/otus/articles/686082/](https://habr.com/ru/companies/otus/articles/686082/)
+- [https://www.baeldung.com/the-persistence-layer-with-spring-data-jpa](https://www.baeldung.com/the-persistence-layer-with-spring-data-jpa)
+- [https://docs.spring.io/spring-data/jpa/reference/jpa/getting-started.html](https://docs.spring.io/spring-data/jpa/reference/jpa/getting-started.html)
+
+### Тест для самопроверки по работе с БД
+
+[https://forms.gle/xf8Lgn7h5gNHENFy8](https://forms.gle/xf8Lgn7h5gNHENFy8)
+
+## Ресурсы
+
+### REST
+
+REST API (Representational State Transfer) – это архитектурный подход, описывающий рамки взаимодействия с API (распределенного приложения в сети). Это не протокол, а скорее список рекомендаций.
+
+API (Application Programming Interface) представляет собой набор определений и протоколов. Разработчики создают API-интерфейсы для взаимодействия и обмена данными одного приложения или сайта с другими. API функционирует как своеобразный шлюз или посредник между клиентами и сервером.
+
+Интерфейс API разрабатывается таким образом, чтобы программное обеспечение могло запросить определенный тип данных через сеть. Интерфейс совместим с любыми языками программирования, операционными системами, программами, сайтами, приложениями, flash и т.д.
+
+Почитать:
+- [https://systems.education/what-is-rest#showmore](https://systems.education/what-is-rest#showmore)
+- [https://skillbox.ru/media/code/rest-api-chto-eto-takoe-i-kak-rabotaet/](https://skillbox.ru/media/code/rest-api-chto-eto-takoe-i-kak-rabotaet/)
+- [https://blog.skillfactory.ru/glossary/rest-api/](https://blog.skillfactory.ru/glossary/rest-api/)
+
+### DTO
+
+Зачастую, в клиент-серверных приложениях, данные на клиенте (слой представления) и на сервере (слой бизнес логики) структурируются по-разному. На стороне сервера это дает нам возможность комфортно хранить данные в базе данных или оптимизировать использование данных в угоду производительности, в то же время заниматься user-friendly отображением данных на клиенте.
+
+Что такое DTO и чем отличается от других объектов:
+- [https://sky.pro/media/razlichiya-mezhdu-dto-vo-pojo-javabeans/](https://sky.pro/media/razlichiya-mezhdu-dto-vo-pojo-javabeans/)
+
+В целом, мы можем перекладывать данные из одного объекта в другой в "ручном" режиме, но можем и автоматизировать этот процесс с помощью библиотек. Например, Mapstruct:
+- [https://habr.com/ru/articles/818489/](https://habr.com/ru/articles/818489/)
+- [https://www.baeldung.com/mapstruct](https://www.baeldung.com/mapstruct)
+
+### OpenAPI
+
+Springdoc OpenAPI — это библиотека, которая автоматизирует генерацию документации OpenAPI 3.0 для RESTful API, реализованных на основе Spring Boot. Она предоставляет аннотации и конфигурации для легкой интеграции и генерации спецификации API на основе кода. 
+
+В целом, Swagger (a.k.a. OpenAPI) — это набор инструментов, который позволяет автоматически описывать API на основе кода **или** правил. В кросс-функциональных командах, работающих по скраму, важно быстро реализовывать фичи за один спринт. У нас нет времени ждать, когда бэк будет готов, чтобы фронт или мобилка приступили к своей реализации. Тут на помощь аналитикам приходит Swagger: он позволяет публиковать контракт API, что дает возможность всем разработчикам — бэкенд, фронтенд и мобильным — работать параллельно.
+
+Дополнительно:
+- [https://community.exolve.ru/blog/swagger-chto-eto-kak-rabotat-s-dokumentatsiey/](https://community.exolve.ru/blog/swagger-chto-eto-kak-rabotat-s-dokumentatsiey/)
+- [Springdoc OpenAPI Official Documentation](https://springdoc.org/)
+- [Spring Boot + Springdoc OpenAPI Integration Example](https://www.baeldung.com/spring-rest-openapi-documentation)
+
+### Тест для самопроверки по ресурсам
+
+[https://forms.gle/udWxkuBDnZnHytTN9](https://forms.gle/udWxkuBDnZnHytTN9)
+
+## Security (pt.1)
+
+### Аутентификация
+
+- [https://habr.com/ru/articles/720842/](https://habr.com/ru/articles/720842/)
+- [https://www.unisender.com/ru/glossary/chto-takoe-email-autentifikaciya/#anchor-1](https://www.unisender.com/ru/glossary/chto-takoe-email-autentifikaciya/#anchor-1)
+- [https://infostart.ru/1c/articles/2035437/](https://infostart.ru/1c/articles/2035437/)
+- [https://zuplo.com/blog/2025/01/03/top-7-api-authentication-methods-compared](https://zuplo.com/blog/2025/01/03/top-7-api-authentication-methods-compared)
+
+### Spring Security
+
+Spring Security значительно упрощает защиту корпоративных приложений, разработанных на Java. Этот мощный фреймворк обеспечивает защиту проекта, предоставляя готовые к использованию функции, которые помогут вам реализовать надежную авторизацию и аутентификацию.
+
+Как реализовать Basic Auth в в Spring:
+
+- [https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/basic.html)
+- [https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html](https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html)
+- [https://jstobigdata.com/spring-security/the-ultimate-guide-to-spring-security-basic-authentication/#toc_5_Integrating_Basic_Authentication_with_a_User_Store](https://jstobigdata.com/spring-security/the-ultimate-guide-to-spring-security-basic-authentication/#toc_5_Integrating_Basic_Authentication_with_a_User_Store)
+- [https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#servlet-authentication-unpwd](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html#servlet-authentication-unpwd) (см. до Create a @RestController for Authentication)
+
+## Security (pt.2)
+
+Помиму аутентификации в приложении необходимо производить разграничение доступа к ресурсам и операциям на основании прав пользователя. За это отвечает авторизация.
+
+### Авторизация
+
+- [https://www.baeldung.com/spring-security-expressions](https://www.baeldung.com/spring-security-expressions)
+- [https://docs.spring.io/spring-security/site/docs/4.0.x/reference/html/el-access.html](https://docs.spring.io/spring-security/site/docs/4.0.x/reference/html/el-access.html)
+- [https://sysout.ru/zashhita-metodov-annotatsiya-preauthorize/](https://sysout.ru/zashhita-metodov-annotatsiya-preauthorize/)
+- [https://www.geeksforgeeks.org/difference-between-hasrole-and-hasauthority-in-spring-security/](https://www.geeksforgeeks.org/difference-between-hasrole-and-hasauthority-in-spring-security/)
+- [https://www.baeldung.com/spring-security-custom-filter](https://www.baeldung.com/spring-security-custom-filter)
+
+### Тест для самопроверки по Spring Security
+
+[https://forms.gle/MtdY99JPLitgfkqq6](https://forms.gle/MtdY99JPLitgfkqq6)
+
+
+# Создание проекта, структура
+
+## Создание основного проекта
 
 Создадим новое Spring Boot приложения с использованием Maven.
 
@@ -152,7 +440,7 @@ Sourcetree.
 
 ![](002.png)
 
-### Многомодульная структура
+## Многомодульная структура
 
 Многомодульная структура позволяет разделить проект на логически изолированные части, что облегчает управление,
 тестирование и повторное использование кода. Модули могут иметь разные названия и назначения, но мы будем использовать
@@ -184,15 +472,6 @@ Sourcetree.
 структуры:
 
 ![](004.png)
-
-## Maven
-
-**Описание:**
-Maven — это инструмент для управления проектами и автоматизации сборки, используемый в Java. Он предоставляет
-стандартизированный способ управления зависимостями, компиляции, тестирования и упаковки приложений. Maven использует
-файл конфигурации `pom.xml` (Project Object Model), который описывает проект, его зависимости, плагины и цели сборки.
-
-Пример конфигурация `pom.xml` можно посмотреть в текущем проекте.
 
 ## Liquibase
 
