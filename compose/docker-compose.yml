@@ -1,26 +1,39 @@
-version: "3.4"
 services:
   postgres:
     image: postgres:14.8-alpine3.18
     environment:
-      POSTGRES_DB: "firstapp"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: firstapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - ./postgres/init:/docker-entrypoint-initdb.d
     ports:
       - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d firstapp"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   firstapp-db:
-    image: firstapp-db:latest
+    build:
+      context: ../firstapp-db
+      dockerfile: Dockerfile
+    container_name: firstapp-db
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/firstapp
-      - DB_SCHEMA=fa
-      - DB_LOGIN=postgres
-      - DB_PASSWORD=postgres
+      DB_URL: jdbc:postgresql://postgres:5432/firstapp
+      DB_SCHEMA: fa
+      DB_LOGIN: postgres
+      DB_PASSWORD: postgres
+
   firstapp:
-    image: firstapp:latest
+    build:
+      context: ../firstapp-impl
+      dockerfile: Dockerfile
+    container_name: firstapp
     ports:
       - "8080:8080"
     depends_on:
