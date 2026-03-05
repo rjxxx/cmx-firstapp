@@ -34,6 +34,17 @@
 * [Создание проекта, структура](#создание-проекта-структура)
   * [Создание основного проекта](#создание-основного-проекта)
   * [Многомодульная структура](#многомодульная-структура)
+* [Kubernetes](#kubernetes)
+  * [Инфраструктура](#инфраструктура)
+    * [Postgres](#postgres)
+    * [Kafka](#kafka)
+    * [Почта](#почта)
+  * [Основные понятия](#основные-понятия)
+  * [Развертывание приложения в kubernetes](#развертывание-приложения-в-kubernetes)
+    * [Сборка образа](#сборка-образа-1)
+    * [Создание схемы БД](#создание-схемы-бд)
+    * [Создание ConfigMaps и Secrets](#создание-configmaps-и-secrets)
+    * [Создание Deployment и запуск приложения](#создание-deployment-и-запуск-приложения)
 * [Задание](#задание)
   * [User Service](#user-service)
     * [Описание](#описание)
@@ -529,6 +540,263 @@ Docker Compose - это инструмент, предназначенный д�
 
 ![](004.png)
 
+
+# Kubernetes
+
+## Инфраструктура
+
+### Postgres
+Работать с БД можно из https://pgadmin.esxo-kube.cmx.ru
+
+Логин - ваш логин
+Пароль - выданный пароль
+
+Внутренний адрес, для приложений: `postgres.infra.svc.cluster.local:5432`
+Для доступа к postgres с локального компьютера: `esxo-kube.cmx.ru:32000`
+
+### Kafka
+
+Посмотреть топики и сообщения в них можно из UI https://kafka-ui.esxo-kube.cmx.ru
+
+![012.png](012.png)
+> [!IMPORTANT]
+> В именах своих топиков используйте свой логин, чтобы не конфликтовать с другими, например `notification.message.user1.in`
+
+Внутренний адрес, для приложений: `kafka.infra.svc.cluster.local:9093`
+Для доступа к kafka с локального компьютера: `esxo-kube.cmx.ru:32001`
+
+В Secrets вашего namespace есть сертификаты (kafka-certs) и пароли к ним (kafka-ssl-password) для подключения к кафке.
+Их можно скачать и использовать для локальной работы.
+
+### Почта
+
+Посмотреть сообщения можно через https://webmail.esxo-kube.cmx.ru/
+Логин - ваш_логин@esxo-kube.cmx.ru
+Пароль - выданный пароль
+
+Внутренний адрес smpt, для приложений: `stalwart.infra.svc.cluster.local:587`
+Для отправки почты с локального компьютера `по smtp: esxo-kube.cmx.ru:30587`
+
+> [!IMPORTANT]
+> Для отправки сообщений нужно отключить проверку сертификатов 
+> spring.mail.properties.mail.smtp.ssl.trust = "*"
+
+## Основные понятия
+
+![013.png](013.png)
+### Kubernetes
+Система оркестрации контейнеров, которая автоматически запускает, масштабирует и управляет контейнерными приложениями в кластере серверов. Следит за состоянием приложений и перезапускает их при сбоях.
+
+### Namespace
+Логическое разделение ресурсов внутри одного Kubernetes-кластера. Используется для изоляции проектов, команд или окружений (например dev, test, prod).
+
+### ConfigMaps и Secrets
+ConfigMap хранит конфигурационные данные приложения (переменные окружения, настройки).
+Secret хранит чувствительные данные (пароли, токены, ключи) в более защищённом виде.
+
+### Pods
+Pod — минимальная единица запуска в Kubernetes. Он содержит один или несколько контейнеров, которые используют общую сеть и хранилище.
+
+### Deployments
+Deployment управляет созданием и обновлением Pod. Он обеспечивает обновления без простоя, масштабирование и откат на предыдущие версии приложения.
+
+### ReplicaSets
+ReplicaSet гарантирует, что в любой момент запущено заданное количество Pod. Если Pod падает или удаляется, ReplicaSet автоматически создаёт новый.
+
+### Services
+Service предоставляет стабильный сетевой адрес для доступа к Pod. Он также выполняет балансировку нагрузки между несколькими Pod.
+
+### Ingresses
+Ingress управляет внешним HTTP/HTTPS доступом к сервисам внутри кластера. Позволяет маршрутизировать запросы по доменам и URL-путям.
+
+### StatefulSets
+StatefulSet используется для приложений с состоянием (например баз данных). Он обеспечивает стабильные имена Pod, порядок запуска и постоянное хранилище данных.
+
+### Init-контейнер
+Init-контейнер запускается перед основными контейнерами Pod и выполняет подготовительные задачи. Например, проверяет доступность базы данных или загружает необходимые данные перед стартом приложения.
+
+## Развертывание приложения в kubernetes
+### Сборка образа
+Залогинимся в docker репозитории с использованием выданных логина и пароля
+`docker login docker-nexus.esxo-kube.cmx.ru`
+
+Соберем образ и поставим ему тег (`-t`)
+`docker build -t docker-nexus.esxo-kube.cmx.ru/images/user1/firstapp:v0.1 .`
+
+Где тег состоит из
+- docker-nexus.esxo-kube.cmx.ru - адрес docker репозитория
+- images - папка в которой будет храниться наш образ
+- user1 - ваш логин
+- firstapp - название образа
+- v0.1 - версия образа
+
+Загрузим собранный образ в репозиторий
+`docker push docker-nexus.esxo-kube.cmx.ru/images/user1/firstapp:v0.1`
+
+Посмотреть загруженный образ можно по адресу https://nexus.esxo-kube.cmx.ru
+![006.png](006.png)
+
+Аналогично нужно собрать и запушить модуль `-db`.
+
+### Создание схемы БД
+
+Перейти по https://pgadmin.esxo-kube.cmx.ru, ввести выданный логин/пароль.
+
+В появившимся окне, на вкладке Общие, задать любое имя подключения. На вкладке Соединение заполнить
+
+- Имя/адрес сервера - postgres.infra.svc.cluster.local
+- Порт - 5432
+- Имя пользователя - выданный логин
+- Пароль - выданный пароль
+- Сохранить пароль? - да
+
+![008.png](008.png)
+
+Далее создадим схему, задав ей имя, которое используете в своем приложении
+
+![009.png](009.png)
+
+
+### Создание ConfigMaps и Secrets
+Зайдем в консоль kubernetes по адресу https://dashboard.esxo-kube.cmx.ru, залогинимся через "Log in with OpenLDAP".
+В верхнем левом углу выберем namespace в котором будем разворачивать наше приложение, его название совпадает с логином.
+
+Сейчас настройки приложения хранятся в файле `application.yml`. Эти настройки невозможно изменить не пересобирая приложение, однако их можно переопределить, для этого будем использовать ConfigMaps и Secrets.
+
+Создадим ConfigMap, для этого в правом верхнем углу нажмем на `+`. В появившемся редакторе введем
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: firstapp-config # название ConfigMap
+data:
+  DB_URL: "jdbc:postgresql://esxo-kube.cmx.ru:32000/firstapp?currentSchema=fa"
+  DB_SCHEMA: "fa"
+  JPA_SHOW_SQL: "true"
+```
+
+Аналогично создадим Secret, указав свой логин и пароль 
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: firstapp-secret # название Secret
+type: Opaque
+stringData:
+  db_username: "postgres"
+  db_password: "postgres"
+  jwt_secret: "3MZ7BDeA3j4p9GXrHYFYNSKfMUs_yxjQPNx#JhFEjj#b7@7mBN#Ifatux4q0bbSMW345A_dRFu0tG3yqdrHCAKVupami2FIIpk3K"
+```
+
+Созданные ConfigMaps и Secret можно посмотреть или отредактировать в соответствующем меню консоли kubernetes
+
+### Создание Deployment и запуск приложения
+
+Создадим Deployment для развертывания нашего приложения 
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment     # Тип ресурса — Deployment
+metadata:
+  name: firstapp     # Имя Deployment'а
+spec:
+  replicas: 1        # Количество подов, которые нужно запустить
+  selector:
+    matchLabels:
+      app: firstapp  # Селектор, который определяет, какие поды входят в этот Deployment
+  template:
+    metadata:
+      labels:
+        app: firstapp  # Метка, которая должна соответствовать селектору выше
+
+    spec:
+      # --- Init контейнер для запуска миграций ---
+      initContainers:
+        - name: firstapp-container-migration  # Имя init-контейнера
+          image: docker-nexus.esxo-kube.cmx.ru/images/user1/firstapp-db:v0.1  # Образ для выполнения миграций
+          env:
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: firstapp-config    # Значение из ConfigMap (например, jdbc URL)
+                  key: DB_URL
+            - name: DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: firstapp-config    # Схема базы данных из ConfigMap
+                  key: DB_SCHEMA
+            - name: DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: firstapp-secret    # Логин из Kubernetes Secret
+                  key: db_username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: firstapp-secret    # Пароль из Kubernetes Secret
+                  key: db_password
+
+      # --- Основной контейнер с приложением ---
+      containers:
+        - name: firstapp-container
+          image: docker-nexus.esxo-kube.cmx.ru/images/user1/firstapp:v0.1  # Образ приложения
+          ports:
+            - containerPort: 8080  # Порт, который слушает приложение внутри контейнера
+          envFrom:
+            - configMapRef:
+                name: firstapp-config  # Загрузка всех переменных из ConfigMap как окружение
+          env:
+            - name: DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: firstapp-secret  # Логин к БД
+                  key: db_username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: firstapp-secret  # Пароль к БД
+                  key: db_password
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: firstapp-secret  # Секрет для подписи JWT
+                  key: jwt_secret
+```
+После нажатия кнопки Upload, помимо созданного Deployment, в меню Pod появится наш запущенный контейнер. 
+Перейдя в контейнер мы увидим подробную информацию и потреблении CPU, памяти и т.д.
+
+Нажав на иконку с полосками, можно посмотреть логи, как init-контейнера, так и логи основного приложения.
+![010.png](010.png)
+
+![011.png](011.png)
+Создадим Service для доступа к нашему приложению
+
+```yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: firstapp-service   # имя сервиса
+  labels:
+    app: firstapp
+spec:
+  type: NodePort
+  selector:
+    app: firstapp
+  ports:
+    - protocol: TCP
+      port: 80             # внутренний порт сервиса
+      targetPort: 8080     # порт приложения в контейнере
+      # nodePort: 30080    # внешний порт по которому будет доступен сервис, не будем его указывать, чтобы Kubernetes выбрал его сам
+```
+Посмотреть выданный порт можно в меню Services
+
+![007.png](007.png)
+
+Теперь развернутый сервис доступен по адресу http://esxo-kube.cmx.ru:30456/
+
 # Задание
 
 **Тема:** Система отправки напоминаний пользователям
@@ -544,8 +812,9 @@ Docker Compose - это инструмент, предназначенный д�
 
 ![](005.png)
 
-Сервисы, а также необходимые для них компоненты (Postgresql и [Apache Kafka](#apache-kafka)), должны запускаться через [Docker Compose](#docker-compose).
-
+Задание состоит из двух частей:
+1) Разработать 3 сервиса в соответствии с подробным описанием ниже. Создать один [Docker Compose](#docker-compose), который будет запускать эти сервисы, а также необходимые для них компоненты (Postgresql и [Apache Kafka](#apache-kafka))
+2) Задеплоить разработанные сервисы в kubernates с готовой инфраструктурой.
 
 ## User Service
 
